@@ -87,8 +87,39 @@
         p {
             font-size: clamp(0.85rem, 1.5vw, 0.95rem);
             color: var(--text-muted);
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             line-height: 1.5;
+        }
+
+        .mode-selector-panel {
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 14px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 24px;
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .mode-btn.active {
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         .input-group {
@@ -137,6 +168,14 @@
             border-color: var(--primary);
             background: #ffffff;
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .standalone-select-wrapper {
+            margin-bottom: 20px;
+        }
+
+        .standalone-select-wrapper select {
+            padding-left: 16px;
         }
 
         .phone-row {
@@ -220,6 +259,14 @@
             max-width: 100%;
             height: auto !important;
             box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+
+        /* Fixed CSS Warning implementation area */
+        .gradient-text-fix {
+            background: linear-gradient(to right, #ffffff, #c7d2fe);
+            -webkit-background-clip: text;
+            background-clip: text; /* Standard property added to fix IDE problem window warning */
+            -webkit-text-fill-color: transparent;
         }
 
         .hub-container {
@@ -422,91 +469,118 @@
 <div id="dashboard-view" class="container dashboard-mode" style="display: none;">
     <div class="card">
         <h2>Smart Hub Workspace</h2>
-        <p>Compile modern multi-action components into a single dynamic profile hub.</p>
+        <p>Compile modern multi-action components or separate individual assets instantly.</p>
 
-        <h3>Identity & Comms</h3>
-        <div class="input-group">
-            <label for="hub-name">Full Name / Profile Identity</label>
-            <div class="input-wrapper">
-                <i class="fa-solid fa-user"></i>
-                <input type="text" id="hub-name" placeholder="John Doe Logistics">
-            </div>
+        <div class="mode-selector-panel">
+            <button id="mode-hub-btn" class="mode-btn active" onclick="switchExecutionMode('hub')">
+                <i class="fa-solid fa-layer-group"></i> Unified Smart Hub
+            </button>
+            <button id="mode-solo-btn" class="mode-btn" onclick="switchExecutionMode('solo')">
+                <i class="fa-solid fa-qrcode"></i> Standalone Asset QR
+            </button>
         </div>
 
-        <div class="phone-row">
+        <div id="panel-hub-fields">
+            <h3>Identity & Comms</h3>
             <div class="input-group">
-                <label for="hub-sim1">SIM 1 Interface (Primary / Work)</label>
+                <label for="hub-name">Full Name / Profile Identity</label>
                 <div class="input-wrapper">
-                    <i class="fa-solid fa-phone"></i>
-                    <input type="tel" id="hub-sim1" placeholder="+255710035933">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="hub-name" placeholder="John Doe Logistics">
                 </div>
             </div>
-            <div class="input-group">
-                <label for="hub-sim2">SIM 2 Interface (Personal / Private)</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-mobile-screen"></i>
-                    <input type="tel" id="hub-sim2" placeholder="+255752208412">
-                </div>
-            </div>
-        </div>
 
-        <div class="input-group">
-            <label for="hub-email">Email Address</label>
-            <div class="input-wrapper">
-                <i class="fa-solid fa-envelope"></i>
-                <input type="email" id="hub-email" placeholder="john@company.com">
-            </div>
-        </div>
-
-        <h3>Wireless Systems</h3>
-        <div class="phone-row">
-            <div class="input-group">
-                <label for="hub-wifi-ssid">Wi-Fi Network Name (SSID)</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-wifi"></i>
-                    <input type="text" id="hub-wifi-ssid" placeholder="Office_Guest_HighSpeed">
+            <div class="phone-row">
+                <div class="input-group">
+                    <label for="hub-sim1">SIM 1 Interface (Primary / Work)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-phone"></i>
+                        <input type="tel" id="hub-sim1" placeholder="+255710035933">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="hub-sim2">SIM 2 Interface (Personal / Private)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-mobile-screen"></i>
+                        <input type="tel" id="hub-sim2" placeholder="+255752208412">
+                    </div>
                 </div>
             </div>
+
             <div class="input-group">
-                <label for="hub-wifi-pass">Wi-Fi Security Key</label>
+                <label for="hub-email">Email Address</label>
                 <div class="input-wrapper">
-                    <i class="fa-solid fa-key"></i>
-                    <input type="password" id="hub-wifi-pass" placeholder="NetworkPassword123">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="hub-email" placeholder="john@company.com">
                 </div>
             </div>
-        </div>
 
-        <div class="input-group">
-            <label for="hub-bt-name">Bluetooth Local Device Pairing Identifier</label>
-            <div class="input-wrapper">
-                <i class="fa-brands fa-bluetooth-b"></i>
-                <input type="text" id="hub-bt-name" placeholder="HQ-Terminal-Node-Alpha">
-            </div>
-        </div>
-
-        <h3>Social Matrix Integrations</h3>
-        <div class="phone-row">
             <div class="input-group">
-                <label for="hub-instagram">Instagram Handle</label>
+                <label for="hub-wa-msg">Default WhatsApp Message String</label>
                 <div class="input-wrapper">
-                    <i class="fa-brands fa-instagram"></i>
-                    <input type="text" id="hub-instagram" placeholder="username">
-                </div>
-            </div>
-            <div class="input-group">
-                <label for="hub-linkedin">LinkedIn Username / ID</label>
-                <div class="input-wrapper">
-                    <i class="fa-brands fa-linkedin-in"></i>
-                    <input type="text" id="hub-linkedin" placeholder="john-doe">
+                    <i class="fa-solid fa-comments" style="margin-top: -10px;"></i>
+                    <textarea id="hub-wa-msg" rows="2" style="padding-top: 12px;" placeholder="Hello! I am scanning your QR code to connect."></textarea>
                 </div>
             </div>
         </div>
 
-        <div class="input-group">
-            <label for="hub-wa-msg">Default WhatsApp Message String</label>
-            <div class="input-wrapper">
-                <i class="fa-solid fa-comments" style="margin-top: -10px;"></i>
-                <textarea id="hub-wa-msg" rows="2" style="padding-top: 12px;" placeholder="Hello! I am scanning your QR code to connect."></textarea>
+        <div id="panel-solo-fields" style="display: none;">
+            <h3>Select Standalone Type</h3>
+            <div class="standalone-select-wrapper">
+                <select id="solo-type-selector" onchange="handleSoloTypeChange()">
+                    <option value="wifi">📶 Connect to Wi-Fi Network</option>
+                    <option value="bluetooth">🔷 Pair Bluetooth Device Identifier</option>
+                    <option value="instagram">📸 Instagram Profile Redirect</option>
+                    <option value="linkedin">💼 LinkedIn Professional Network</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="module-wireless">
+            <h3>Wireless Systems</h3>
+            <div class="phone-row" id="row-wifi-inputs">
+                <div class="input-group">
+                    <label for="hub-wifi-ssid">Wi-Fi Network Name (SSID)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-wifi"></i>
+                        <input type="text" id="hub-wifi-ssid" placeholder="Office_Guest_HighSpeed">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="hub-wifi-pass">Wi-Fi Security Key</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-key"></i>
+                        <input type="password" id="hub-wifi-pass" placeholder="NetworkPassword123">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group" id="row-bt-inputs">
+                <label for="hub-bt-name">Bluetooth Local Device Pairing Identifier</label>
+                <div class="input-wrapper">
+                    <i class="fa-brands fa-bluetooth-b"></i>
+                    <input type="text" id="hub-bt-name" placeholder="Clavy's A06">
+                </div>
+            </div>
+        </div>
+
+        <div id="module-social">
+            <h3>Social Matrix Integrations</h3>
+            <div class="phone-row">
+                <div class="input-group" id="wrap-ig-input">
+                    <label for="hub-instagram">Instagram Handle</label>
+                    <div class="input-wrapper">
+                        <i class="fa-brands fa-instagram"></i>
+                        <input type="text" id="hub-instagram" placeholder="username">
+                    </div>
+                </div>
+                <div class="input-group" id="wrap-li-input">
+                    <label for="hub-linkedin">LinkedIn Username / ID</label>
+                    <div class="input-wrapper">
+                        <i class="fa-brands fa-linkedin-in"></i>
+                        <input type="text" id="hub-linkedin" placeholder="john-doe">
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -655,6 +729,7 @@
 <script>
     let userUploadedLogo = null;
     let globalHubData = {};
+    let activeExecutionMode = 'hub'; // Tracks default environment mode
 
     document.getElementById('logo-file').addEventListener('change', function(e) {
         const reader = new FileReader();
@@ -680,7 +755,65 @@
 
     function initDashboardWorkspaceView() {
         document.getElementById('dashboard-view').style.display = 'grid';
+        switchExecutionMode('hub');
         renderSavedHistory();
+    }
+
+    function switchExecutionMode(mode) {
+        activeExecutionMode = mode;
+        const hubBtn = document.getElementById('mode-hub-btn');
+        const soloBtn = document.getElementById('mode-solo-btn');
+        const hubFields = document.getElementById('panel-hub-fields');
+        const soloFields = document.getElementById('panel-solo-fields');
+
+        if (mode === 'hub') {
+            hubBtn.classList.add('active');
+            soloBtn.classList.remove('active');
+            hubFields.style.display = 'block';
+            soloFields.style.display = 'none';
+            
+            // Show all module layers for full hub linking configuration
+            document.getElementById('module-wireless').style.display = 'block';
+            document.getElementById('row-wifi-inputs').style.display = 'grid';
+            document.getElementById('row-bt-inputs').style.display = 'block';
+            document.getElementById('module-social').style.display = 'block';
+            document.getElementById('wrap-ig-input').style.display = 'block';
+            document.getElementById('wrap-li-input').style.display = 'block';
+        } else {
+            soloBtn.classList.add('active');
+            hubBtn.classList.remove('active');
+            hubFields.style.display = 'none';
+            soloFields.style.display = 'block';
+            handleSoloTypeChange(); // Contextually toggle relevant visibility sub-arrays
+        }
+    }
+
+    function handleSoloTypeChange() {
+        if (activeExecutionMode !== 'solo') return;
+        
+        const selectedType = document.getElementById('solo-type-selector').value;
+        
+        // Reset sub-module layer display grids
+        document.getElementById('module-wireless').style.display = 'none';
+        document.getElementById('row-wifi-inputs').style.display = 'none';
+        document.getElementById('row-bt-inputs').style.display = 'none';
+        document.getElementById('module-social').style.display = 'none';
+        document.getElementById('wrap-ig-input').style.display = 'none';
+        document.getElementById('wrap-li-input').style.display = 'none';
+
+        if (selectedType === 'wifi') {
+            document.getElementById('module-wireless').style.display = 'block';
+            document.getElementById('row-wifi-inputs').style.display = 'grid';
+        } else if (selectedType === 'bluetooth') {
+            document.getElementById('module-wireless').style.display = 'block';
+            document.getElementById('row-bt-inputs').style.display = 'block';
+        } else if (selectedType === 'instagram') {
+            document.getElementById('module-social').style.display = 'block';
+            document.getElementById('wrap-ig-input').style.display = 'block';
+        } else if (selectedType === 'linkedin') {
+            document.getElementById('module-social').style.display = 'block';
+            document.getElementById('wrap-li-input').style.display = 'block';
+        }
     }
 
     function initConsumerHubView(params) {
@@ -722,7 +855,6 @@
             document.getElementById('sub-save-sim2').style.display = 'none';
         }
 
-        // Display Wi-Fi configuration context if assigned
         if (globalHubData.wifiSSID) {
             const wifiBtn = document.getElementById('btn-wifi');
             wifiBtn.style.display = 'flex';
@@ -730,13 +862,11 @@
             document.getElementById('sub-wifi-name').innerText = `SSID: ${globalHubData.wifiSSID}`;
         }
 
-        // Bluetooth Setup configuration display parameters
         if (globalHubData.btName) {
             document.getElementById('btn-bt').style.display = 'flex';
             document.getElementById('sub-bt-name').innerText = `Identify: ${globalHubData.btName}`;
         }
 
-        // Instagram Verification profiles
         if (globalHubData.ig) {
             const igBtn = document.getElementById('btn-instagram');
             igBtn.style.display = 'flex';
@@ -744,7 +874,6 @@
             document.getElementById('sub-instagram').innerText = `@${globalHubData.ig}`;
         }
 
-        // LinkedIn network parameters
         if (globalHubData.li) {
             const liBtn = document.getElementById('btn-linkedin');
             liBtn.style.display = 'flex';
@@ -755,7 +884,7 @@
 
     function copyBluetoothName() {
         navigator.clipboard.writeText(globalHubData.btName);
-        alert(`Bluetooth Pairing Asset ID [ ${globalHubData.btName} ] copied to clipboard array matrix.`);
+        alert(`Bluetooth Pairing Asset ID [ ${globalHubData.btName} ] copied to clipboard.`);
     }
 
     function toggleInspectorPanel() {
@@ -803,29 +932,57 @@
 
     function compileSmartHubQR(historicalPayload = null) {
         let routingPayload = "";
-        let name = "";
+        let logName = "";
 
         if (historicalPayload) {
             routingPayload = historicalPayload;
         } else {
-            name = document.getElementById('hub-name').value.trim();
-            const sim1 = document.getElementById('hub-sim1').value.trim();
-            const sim2 = document.getElementById('hub-sim2').value.trim();
-            const email = document.getElementById('hub-email').value.trim();
-            const msg = document.getElementById('hub-wa-msg').value.trim();
-            const wifiSSID = document.getElementById('hub-wifi-ssid').value.trim();
-            const wifiPass = document.getElementById('hub-wifi-pass').value.trim();
-            const btName = document.getElementById('hub-bt-name').value.trim();
-            const ig = document.getElementById('hub-instagram').value.trim();
-            const li = document.getElementById('hub-linkedin').value.trim();
+            if (activeExecutionMode === 'hub') {
+                const name = document.getElementById('hub-name').value.trim();
+                const sim1 = document.getElementById('hub-sim1').value.trim();
+                const sim2 = document.getElementById('hub-sim2').value.trim();
+                const email = document.getElementById('hub-email').value.trim();
+                const msg = document.getElementById('hub-wa-msg').value.trim();
+                const wifiSSID = document.getElementById('hub-wifi-ssid').value.trim();
+                const wifiPass = document.getElementById('hub-wifi-pass').value.trim();
+                const btName = document.getElementById('hub-bt-name').value.trim();
+                const ig = document.getElementById('hub-instagram').value.trim();
+                const li = document.getElementById('hub-linkedin').value.trim();
 
-            if (!name) return alert("Profile Name attribute required.");
-            if (!sim1 && !sim2) return alert("At least one target SIM interface allocation is mandatory.");
+                if (!name) return alert("Profile Name attribute required for Hub Mode.");
+                if (!sim1 && !sim2) return alert("At least one target SIM interface allocation is mandatory.");
 
-            const baseSystemURL = window.location.origin + window.location.pathname;
-            routingPayload = `${baseSystemURL}?n=${encodeURIComponent(name)}&s1=${encodeURIComponent(sim1)}&s2=${encodeURIComponent(sim2)}&e=${encodeURIComponent(email)}&m=${encodeURIComponent(msg)}&ws=${encodeURIComponent(wifiSSID)}&wp=${encodeURIComponent(wifiPass)}&bt=${encodeURIComponent(btName)}&ig=${encodeURIComponent(ig)}&li=${encodeURIComponent(li)}`;
+                logName = `${name} (Hub)`;
+                const baseSystemURL = window.location.origin + window.location.pathname;
+                routingPayload = `${baseSystemURL}?n=${encodeURIComponent(name)}&s1=${encodeURIComponent(sim1)}&s2=${encodeURIComponent(sim2)}&e=${encodeURIComponent(email)}&m=${encodeURIComponent(msg)}&ws=${encodeURIComponent(wifiSSID)}&wp=${encodeURIComponent(wifiPass)}&bt=${encodeURIComponent(btName)}&ig=${encodeURIComponent(ig)}&li=${encodeURIComponent(li)}`;
+            } else {
+                // Standalone mode processing rules
+                const soloType = document.getElementById('solo-type-selector').value;
+                if (soloType === 'wifi') {
+                    const ssid = document.getElementById('hub-wifi-ssid').value.trim();
+                    const pass = document.getElementById('hub-wifi-pass').value.trim();
+                    if (!ssid) return alert("Wi-Fi SSID name parameters required.");
+                    routingPayload = `WIFI:S:${ssid};T:WPA;P:${pass};;`;
+                    logName = `SSID: ${ssid} (Wi-Fi)`;
+                } else if (soloType === 'bluetooth') {
+                    const bt = document.getElementById('hub-bt-name').value.trim();
+                    if (!bt) return alert("Bluetooth identifier name required.");
+                    routingPayload = `BT:${bt}`;
+                    logName = `${bt} (Bluetooth)`;
+                } else if (soloType === 'instagram') {
+                    const ig = document.getElementById('hub-instagram').value.trim();
+                    if (!ig) return alert("Instagram handle required.");
+                    routingPayload = `https://instagram.com/${ig}`;
+                    logName = `@${ig} (Instagram)`;
+                } else if (soloType === 'linkedin') {
+                    const li = document.getElementById('hub-linkedin').value.trim();
+                    if (!li) return alert("LinkedIn user identification string required.");
+                    routingPayload = `https://linkedin.com/in/${li}`;
+                    logName = `${li} (LinkedIn)`;
+                }
+            }
             
-            saveToMemoryBank(name, routingPayload);
+            saveToMemoryBank(logName, routingPayload);
         }
 
         const fg = document.getElementById('fg-color').value;
