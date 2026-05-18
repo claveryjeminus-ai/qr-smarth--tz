@@ -209,7 +209,7 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.02);
         }
 
-        /* Hub Interface Styles */
+        /* Hub Presentation Screen Styles */
         .hub-container {
             max-width: 460px;
             width: 100%;
@@ -246,6 +246,9 @@
             border-radius: 18px;
             font-weight: 700;
             box-shadow: var(--shadow-ambient);
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
         }
 
         .hub-btn:hover {
@@ -265,6 +268,7 @@
             margin-right: 16px;
             color: var(--primary);
             font-size: 18px;
+            flex-shrink: 0;
         }
 
         .hub-btn .subtitle {
@@ -277,6 +281,74 @@
         }
 
         .hub-btn div { display: flex; flex-direction: column; align-items: flex-start; }
+
+        /* Dynamic Expandable Inspector Sub-Panel styles */
+        .inspector-panel {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 10px;
+            background: #f8fafc;
+            border-radius: 16px;
+            margin-top: -6px;
+            margin-bottom: 14px;
+            border: 1px solid transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .inspector-panel.open {
+            max-height: 350px;
+            padding: 16px;
+            border-color: var(--border-soft);
+        }
+
+        .sub-action-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-soft);
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .sub-action-row:hover {
+            border-color: var(--primary);
+            background: #fdfdfd;
+        }
+
+        .sub-action-row div {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .sub-action-row label {
+            margin: 0;
+            color: var(--primary);
+            font-size: 10px;
+        }
+
+        .sub-action-row span.num-val {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .sub-action-row .btn-mini-icon {
+            width: 32px;
+            height: 32px;
+            background: #e0e7ff;
+            color: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
 
         .history-list { list-style: none; padding: 0; margin: 0; max-height: 400px; overflow-y: auto; }
         .history-item {
@@ -421,18 +493,45 @@
             </div>
         </a>
 
-        <button onclick="downloadUnifiedVCard()" class="hub-btn" style="width: 100%; cursor: pointer; text-align: left; background: #ffffff;">
+        <div id="accordion-trigger" class="hub-btn" onclick="toggleInspectorPanel()">
             <div class="icon-box" style="color: #6366f1; background: #e0e7ff;"><i class="fa-solid fa-address-card"></i></div>
             <div>
-                <strong>Export Unified VCF Card</strong>
-                <span class="subtitle">Inject complete profile directly into local contacts</span>
+                <strong>Add / Save to Contacts</strong>
+                <span class="subtitle">Choose specific numbers or save full record</span>
             </div>
-        </button>
+        </div>
+
+        <div id="inspector-drawer" class="inspector-panel">
+            <a id="sub-save-sim1" href="#" class="sub-action-row">
+                <div>
+                    <label>Pre-fill SIM 1 Dialer Only</label>
+                    <span class="num-val" id="text-sim1-val">No Line</span>
+                </div>
+                <div class="btn-mini-icon"><i class="fa-solid fa-keyboard"></i></div>
+            </a>
+
+            <a id="sub-save-sim2" href="#" class="sub-action-row">
+                <div>
+                    <label>Pre-fill SIM 2 Dialer Only</label>
+                    <span class="num-val" id="text-sim2-val">No Line</span>
+                </div>
+                <div class="btn-mini-icon"><i class="fa-solid fa-keyboard"></i></div>
+            </a>
+
+            <div class="sub-action-row" style="cursor: pointer; background: var(--gradient); border: none;" onclick="downloadUnifiedVCard()">
+                <div>
+                    <label style="color: rgba(255,255,255,0.85);">Automated Generation</label>
+                    <span class="num-val" style="color: #ffffff;">Save Both Slots (SIM 1 + SIM 2)</span>
+                </div>
+                <div class="btn-mini-icon" style="background: rgba(255,255,255,0.2); color: #ffffff;"><i class="fa-solid fa-file-invoice"></i></div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     let userUploadedLogo = null;
+    let globalHubData = {};
 
     document.getElementById('logo-file').addEventListener('change', function(e) {
         const reader = new FileReader();
@@ -479,17 +578,32 @@
             document.getElementById('btn-call-sim1').href = `tel:${globalHubData.sim1}`;
             document.getElementById('sub-sim1').innerText = globalHubData.sim1;
             document.getElementById('btn-wa-sim1').href = `https://wa.me/${globalHubData.sim1.replace(/\+/g, '')}?text=${encodeURIComponent(globalHubData.msg)}`;
+            
+            // Populate Inspector Sub-Rows
+            document.getElementById('sub-save-sim1').href = `tel:${globalHubData.sim1}`;
+            document.getElementById('text-sim1-val').innerText = globalHubData.sim1;
         } else {
             document.getElementById('btn-call-sim1').style.display = 'none';
             document.getElementById('btn-wa-sim1').style.display = 'none';
+            document.getElementById('sub-save-sim1').style.display = 'none';
         }
 
         if (globalHubData.sim2) {
             document.getElementById('btn-call-sim2').href = `tel:${globalHubData.sim2}`;
             document.getElementById('sub-sim2').innerText = globalHubData.sim2;
+            
+            // Populate Inspector Sub-Rows
+            document.getElementById('sub-save-sim2').href = `tel:${globalHubData.sim2}`;
+            document.getElementById('text-sim2-val').innerText = globalHubData.sim2;
         } else {
             document.getElementById('btn-call-sim2').style.display = 'none';
+            document.getElementById('sub-save-sim2').style.display = 'none';
         }
+    }
+
+    function toggleInspectorPanel() {
+        const drawer = document.getElementById('inspector-drawer');
+        drawer.classList.toggle('open');
     }
 
     function compileSmartHubQR(historicalPayload = null) {
@@ -545,12 +659,13 @@
     }
 
     function downloadUnifiedVCard() {
+        // Enforce explicit standard structural tagging so multi-sim devices file them cleanly
         const vcardPayload = [
             'BEGIN:VCARD',
             'VERSION:3.0',
             `FN:${globalHubData.name}`,
-            globalHubData.sim1 ? `TEL;TYPE=CELL,VOICE,MSG:${globalHubData.sim1}` : '',
-            globalHubData.sim2 ? `TEL;TYPE=CELL,WORK,SIM2:${globalHubData.sim2}` : '',
+            globalHubData.sim1 ? `TEL;TYPE=CELL,WORK,VOICE:${globalHubData.sim1}` : '',
+            globalHubData.sim2 ? `TEL;TYPE=CELL,HOME,VOICE:${globalHubData.sim2}` : '',
             globalHubData.email ? `EMAIL;TYPE=PREF,INTERNET:${globalHubData.email}` : '',
             'END:VCARD'
         ].filter(Boolean).join('\n');
