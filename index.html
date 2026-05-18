@@ -298,9 +298,37 @@
         }
 
         .inspector-panel.open {
-            max-height: 350px;
+            max-height: 480px; /* Expanded slightly to account for the hint box safely */
             padding: 16px;
             border-color: var(--border-soft);
+        }
+
+        /* Enhanced Clear Instruction Notification Box */
+        .instruction-hint-box {
+            background: #eff6ff;
+            border: 1px dashed #bfdbfe;
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .instruction-hint-box i {
+            color: #3b82f6;
+            font-size: 16px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .instruction-hint-box p {
+            font-size: 12px;
+            color: #1e3a8a;
+            line-height: 1.45;
+            margin: 0;
+            font-weight: 500;
         }
 
         .sub-action-row {
@@ -504,6 +532,12 @@
         </div>
 
         <div id="inspector-drawer" class="inspector-panel">
+            
+            <div class="instruction-hint-box">
+                <i class="fa-solid fa-circle-info"></i>
+                <p>Tap a specific line or choose "Complete Sync" to download an import file. Your phone will instantly open its native contacts screen with all fields filled out automatically for you to save.</p>
+            </div>
+
             <div id="sub-save-sim1" class="sub-action-row" onclick="saveIndividualTarget('sim1')">
                 <div>
                     <label>Save SIM 1 Component Only</label>
@@ -602,7 +636,6 @@
         drawer.classList.toggle('open');
     }
 
-    // Dynamic, Isolated Single-Number vCard Generator 
     function saveIndividualTarget(targetType) {
         let numberValue = targetType === 'sim1' ? globalHubData.sim1 : globalHubData.sim2;
         let slotLabel = targetType === 'sim1' ? 'SIM 1' : 'SIM 2';
