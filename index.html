@@ -313,6 +313,7 @@
             border: 1px solid var(--border-soft);
             text-decoration: none;
             color: var(--text-main);
+            cursor: pointer;
         }
 
         .sub-action-row:hover {
@@ -330,6 +331,7 @@
             margin: 0;
             color: var(--primary);
             font-size: 10px;
+            cursor: pointer;
         }
 
         .sub-action-row span.num-val {
@@ -502,28 +504,28 @@
         </div>
 
         <div id="inspector-drawer" class="inspector-panel">
-            <a id="sub-save-sim1" href="#" class="sub-action-row">
+            <div id="sub-save-sim1" class="sub-action-row" onclick="saveIndividualTarget('sim1')">
                 <div>
-                    <label>Pre-fill SIM 1 Dialer Only</label>
+                    <label>Save SIM 1 Component Only</label>
                     <span class="num-val" id="text-sim1-val">No Line</span>
                 </div>
-                <div class="btn-mini-icon"><i class="fa-solid fa-keyboard"></i></div>
-            </a>
+                <div class="btn-mini-icon"><i class="fa-solid fa-user-plus"></i></div>
+            </div>
 
-            <a id="sub-save-sim2" href="#" class="sub-action-row">
+            <div id="sub-save-sim2" class="sub-action-row" onclick="saveIndividualTarget('sim2')">
                 <div>
-                    <label>Pre-fill SIM 2 Dialer Only</label>
+                    <label>Save SIM 2 Component Only</label>
                     <span class="num-val" id="text-sim2-val">No Line</span>
                 </div>
-                <div class="btn-mini-icon"><i class="fa-solid fa-keyboard"></i></div>
-            </a>
+                <div class="btn-mini-icon"><i class="fa-solid fa-user-plus"></i></div>
+            </div>
 
-            <div class="sub-action-row" style="cursor: pointer; background: var(--gradient); border: none;" onclick="downloadUnifiedVCard()">
+            <div class="sub-action-row" style="background: var(--gradient); border: none;" onclick="downloadUnifiedVCard()">
                 <div>
-                    <label style="color: rgba(255,255,255,0.85);">Automated Generation</label>
+                    <label style="color: rgba(255,255,255,0.85);">Complete Sync</label>
                     <span class="num-val" style="color: #ffffff;">Save Both Slots (SIM 1 + SIM 2)</span>
                 </div>
-                <div class="btn-mini-icon" style="background: rgba(255,255,255,0.2); color: #ffffff;"><i class="fa-solid fa-file-invoice"></i></div>
+                <div class="btn-mini-icon" style="background: rgba(255,255,255,0.2); color: #ffffff;"><i class="fa-solid fa-address-book"></i></div>
             </div>
         </div>
     </div>
@@ -578,9 +580,6 @@
             document.getElementById('btn-call-sim1').href = `tel:${globalHubData.sim1}`;
             document.getElementById('sub-sim1').innerText = globalHubData.sim1;
             document.getElementById('btn-wa-sim1').href = `https://wa.me/${globalHubData.sim1.replace(/\+/g, '')}?text=${encodeURIComponent(globalHubData.msg)}`;
-            
-            // Populate Inspector Sub-Rows
-            document.getElementById('sub-save-sim1').href = `tel:${globalHubData.sim1}`;
             document.getElementById('text-sim1-val').innerText = globalHubData.sim1;
         } else {
             document.getElementById('btn-call-sim1').style.display = 'none';
@@ -591,9 +590,6 @@
         if (globalHubData.sim2) {
             document.getElementById('btn-call-sim2').href = `tel:${globalHubData.sim2}`;
             document.getElementById('sub-sim2').innerText = globalHubData.sim2;
-            
-            // Populate Inspector Sub-Rows
-            document.getElementById('sub-save-sim2').href = `tel:${globalHubData.sim2}`;
             document.getElementById('text-sim2-val').innerText = globalHubData.sim2;
         } else {
             document.getElementById('btn-call-sim2').style.display = 'none';
@@ -604,6 +600,45 @@
     function toggleInspectorPanel() {
         const drawer = document.getElementById('inspector-drawer');
         drawer.classList.toggle('open');
+    }
+
+    // Dynamic, Isolated Single-Number vCard Generator 
+    function saveIndividualTarget(targetType) {
+        let numberValue = targetType === 'sim1' ? globalHubData.sim1 : globalHubData.sim2;
+        let slotLabel = targetType === 'sim1' ? 'SIM 1' : 'SIM 2';
+        
+        const singleVCard = [
+            'BEGIN:VCARD',
+            'VERSION:3.0',
+            `FN:${globalHubData.name} (${slotLabel})`,
+            `TEL;TYPE=CELL,VOICE:${numberValue}`,
+            globalHubData.email ? `EMAIL;TYPE=PREF,INTERNET:${globalHubData.email}` : '',
+            'END:VCARD'
+        ].filter(Boolean).join('\n');
+
+        triggerVCardDownload(singleVCard, `${globalHubData.name.replace(/\s+/g, '_')}_${targetType}`);
+    }
+
+    function downloadUnifiedVCard() {
+        const vcardPayload = [
+            'BEGIN:VCARD',
+            'VERSION:3.0',
+            `FN:${globalHubData.name}`,
+            globalHubData.sim1 ? `TEL;TYPE=CELL,WORK,VOICE:${globalHubData.sim1}` : '',
+            globalHubData.sim2 ? `TEL;TYPE=CELL,HOME,VOICE:${globalHubData.sim2}` : '',
+            globalHubData.email ? `EMAIL;TYPE=PREF,INTERNET:${globalHubData.email}` : '',
+            'END:VCARD'
+        ].filter(Boolean).join('\n');
+
+        triggerVCardDownload(vcardPayload, `${globalHubData.name.replace(/\s+/g, '_')}_full`);
+    }
+
+    function triggerVCardDownload(payloadText, fileName) {
+        const blob = new Blob([payloadText], { type: 'text/vcard;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.download = `${fileName}.vcf`;
+        link.href = URL.createObjectURL(blob);
+        link.click();
     }
 
     function compileSmartHubQR(historicalPayload = null) {
@@ -656,25 +691,6 @@
 
         document.getElementById('qr-container').style.display = 'block';
         document.getElementById('qr-container').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function downloadUnifiedVCard() {
-        // Enforce explicit standard structural tagging so multi-sim devices file them cleanly
-        const vcardPayload = [
-            'BEGIN:VCARD',
-            'VERSION:3.0',
-            `FN:${globalHubData.name}`,
-            globalHubData.sim1 ? `TEL;TYPE=CELL,WORK,VOICE:${globalHubData.sim1}` : '',
-            globalHubData.sim2 ? `TEL;TYPE=CELL,HOME,VOICE:${globalHubData.sim2}` : '',
-            globalHubData.email ? `EMAIL;TYPE=PREF,INTERNET:${globalHubData.email}` : '',
-            'END:VCARD'
-        ].filter(Boolean).join('\n');
-
-        const blob = new Blob([vcardPayload], { type: 'text/vcard;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.download = `${globalHubData.name.replace(/\s+/g, '_')}_contact.vcf`;
-        link.href = URL.createObjectURL(blob);
-        link.click();
     }
 
     function downloadQR() {
