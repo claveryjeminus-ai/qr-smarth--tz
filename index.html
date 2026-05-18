@@ -73,6 +73,17 @@
             color: var(--text-main);
         }
 
+        h3 {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
+            margin: 20px 0 12px 0;
+            padding-bottom: 6px;
+            border-bottom: 1px dashed var(--border-soft);
+        }
+
         p {
             font-size: clamp(0.85rem, 1.5vw, 0.95rem);
             color: var(--text-muted);
@@ -82,14 +93,14 @@
 
         .input-group {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
             font-weight: 700;
             font-size: 11px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.75px;
@@ -108,20 +119,21 @@
             font-size: 16px;
         }
 
-        input, textarea {
+        input, textarea, select {
             width: 100%;
-            padding: 14px 16px 14px 44px;
+            padding: 12px 16px 12px 44px;
             border: 1px solid var(--border-soft);
-            border-radius: 14px;
+            border-radius: 12px;
             box-sizing: border-box;
-            font-size: 15px;
+            font-size: 14px;
             background: #f8fafc;
             color: var(--text-main);
             outline: none;
             box-shadow: var(--shadow-inset);
+            appearance: none;
         }
 
-        input:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             border-color: var(--primary);
             background: #ffffff;
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
@@ -141,6 +153,7 @@
             border: 1px solid var(--border-soft);
             padding: 16px;
             border-radius: 16px;
+            margin-top: 12px;
             margin-bottom: 24px;
         }
 
@@ -209,7 +222,6 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.02);
         }
 
-        /* Hub Presentation Screen Styles */
         .hub-container {
             max-width: 460px;
             width: 100%;
@@ -236,14 +248,14 @@
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            padding: 16px 20px;
-            font-size: 15px;
-            margin-bottom: 14px;
+            padding: 14px 18px;
+            font-size: 14px;
+            margin-bottom: 12px;
             background: #ffffff;
             border: 1px solid var(--border-soft);
             text-decoration: none;
             color: var(--text-main);
-            border-radius: 18px;
+            border-radius: 16px;
             font-weight: 700;
             box-shadow: var(--shadow-ambient);
             cursor: pointer;
@@ -258,22 +270,22 @@
         }
 
         .hub-btn .icon-box {
-            width: 42px;
-            height: 42px;
+            width: 38px;
+            height: 38px;
             background: #f1f5f9;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 16px;
+            margin-right: 14px;
             color: var(--primary);
-            font-size: 18px;
+            font-size: 16px;
             flex-shrink: 0;
         }
 
         .hub-btn .subtitle {
             display: block;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             font-weight: 400;
             text-align: left;
@@ -282,7 +294,6 @@
 
         .hub-btn div { display: flex; flex-direction: column; align-items: flex-start; }
 
-        /* Dynamic Expandable Inspector Sub-Panel styles */
         .inspector-panel {
             max-height: 0;
             overflow: hidden;
@@ -298,12 +309,11 @@
         }
 
         .inspector-panel.open {
-            max-height: 480px; /* Expanded slightly to account for the hint box safely */
+            max-height: 520px;
             padding: 16px;
             border-color: var(--border-soft);
         }
 
-        /* Enhanced Clear Instruction Notification Box */
         .instruction-hint-box {
             background: #eff6ff;
             border: 1px dashed #bfdbfe;
@@ -414,6 +424,7 @@
         <h2>Smart Hub Workspace</h2>
         <p>Compile modern multi-action components into a single dynamic profile hub.</p>
 
+        <h3>Identity & Comms</h3>
         <div class="input-group">
             <label for="hub-name">Full Name / Profile Identity</label>
             <div class="input-wrapper">
@@ -427,14 +438,14 @@
                 <label for="hub-sim1">SIM 1 Interface (Primary / Work)</label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-phone"></i>
-                    <input type="tel" id="hub-sim1" placeholder="+1234567890">
+                    <input type="tel" id="hub-sim1" placeholder="+255710035933">
                 </div>
             </div>
             <div class="input-group">
                 <label for="hub-sim2">SIM 2 Interface (Personal / Private)</label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-mobile-screen"></i>
-                    <input type="tel" id="hub-sim2" placeholder="+10987654321">
+                    <input type="tel" id="hub-sim2" placeholder="+255752208412">
                 </div>
             </div>
         </div>
@@ -444,6 +455,50 @@
             <div class="input-wrapper">
                 <i class="fa-solid fa-envelope"></i>
                 <input type="email" id="hub-email" placeholder="john@company.com">
+            </div>
+        </div>
+
+        <h3>Wireless Systems</h3>
+        <div class="phone-row">
+            <div class="input-group">
+                <label for="hub-wifi-ssid">Wi-Fi Network Name (SSID)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-wifi"></i>
+                    <input type="text" id="hub-wifi-ssid" placeholder="Office_Guest_HighSpeed">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="hub-wifi-pass">Wi-Fi Security Key</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="password" id="hub-wifi-pass" placeholder="NetworkPassword123">
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="hub-bt-name">Bluetooth Local Device Pairing Identifier</label>
+            <div class="input-wrapper">
+                <i class="fa-brands fa-bluetooth-b"></i>
+                <input type="text" id="hub-bt-name" placeholder="HQ-Terminal-Node-Alpha">
+            </div>
+        </div>
+
+        <h3>Social Matrix Integrations</h3>
+        <div class="phone-row">
+            <div class="input-group">
+                <label for="hub-instagram">Instagram Handle</label>
+                <div class="input-wrapper">
+                    <i class="fa-brands fa-instagram"></i>
+                    <input type="text" id="hub-instagram" placeholder="username">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="hub-linkedin">LinkedIn Username / ID</label>
+                <div class="input-wrapper">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                    <input type="text" id="hub-linkedin" placeholder="john-doe">
+                </div>
             </div>
         </div>
 
@@ -497,7 +552,7 @@
     <div class="card" style="padding: 2.5rem 2rem;">
         <div id="hub-avatar" class="avatar-circle">U</div>
         <h2 id="display-name" style="margin-bottom: 4px;">User Profile</h2>
-        <p id="display-subtitle" style="margin-bottom: 28px;">Unified Communication Profile</p>
+        <p id="display-subtitle" style="margin-bottom: 24px;">Unified Communication Profile</p>
 
         <a id="btn-call-sim1" href="#" class="hub-btn">
             <div class="icon-box"><i class="fa-solid fa-phone"></i></div>
@@ -520,6 +575,38 @@
             <div>
                 <strong>Secure WhatsApp Network</strong>
                 <span class="subtitle">Initialize direct encrypted chat execution</span>
+            </div>
+        </a>
+
+        <a id="btn-wifi" href="#" class="hub-btn" style="display: none;">
+            <div class="icon-box" style="color: #3b82f6; background: #eff6ff;"><i class="fa-solid fa-wifi"></i></div>
+            <div>
+                <strong>Connect to Local Wi-Fi</strong>
+                <span class="subtitle" id="sub-wifi-name">Join SSID Configuration</span>
+            </div>
+        </a>
+
+        <div id="btn-bt" class="hub-btn" style="display: none;" onclick="copyBluetoothName()">
+            <div class="icon-box" style="color: #2563eb; background: #eff6ff;"><i class="fa-brands fa-bluetooth-b"></i></div>
+            <div>
+                <strong>Pair Bluetooth Target Device</strong>
+                <span class="subtitle" id="sub-bt-name">Copy terminal profile key</span>
+            </div>
+        </div>
+
+        <a id="btn-instagram" href="#" target="_blank" class="hub-btn" style="display: none;">
+            <div class="icon-box" style="color: #db2777; background: #fdf2f8;"><i class="fa-brands fa-instagram"></i></div>
+            <div>
+                <strong>Follow Instagram Handle</strong>
+                <span class="subtitle" id="sub-instagram">Open Social Profile Matrix</span>
+            </div>
+        </a>
+
+        <a id="btn-linkedin" href="#" target="_blank" class="hub-btn" style="display: none;">
+            <div class="icon-box" style="color: #0284c7; background: #f0f9ff;"><i class="fa-brands fa-linkedin-in"></i></div>
+            <div>
+                <strong>Connect on LinkedIn Network</strong>
+                <span class="subtitle" id="sub-linkedin">View professional background</span>
             </div>
         </a>
 
@@ -604,7 +691,12 @@
             sim1: params.get('s1') || '',
             sim2: params.get('s2') || '',
             email: params.get('e') || '',
-            msg: params.get('m') || "Hello! Let's connect."
+            msg: params.get('m') || "Hello! Let's connect.",
+            wifiSSID: params.get('ws') || '',
+            wifiPass: params.get('wp') || '',
+            btName: params.get('bt') || '',
+            ig: params.get('ig') || '',
+            li: params.get('li') || ''
         };
 
         document.getElementById('display-name').innerText = globalHubData.name;
@@ -629,6 +721,41 @@
             document.getElementById('btn-call-sim2').style.display = 'none';
             document.getElementById('sub-save-sim2').style.display = 'none';
         }
+
+        // Display Wi-Fi configuration context if assigned
+        if (globalHubData.wifiSSID) {
+            const wifiBtn = document.getElementById('btn-wifi');
+            wifiBtn.style.display = 'flex';
+            wifiBtn.href = `WIFI:S:${globalHubData.wifiSSID};T:WPA;P:${globalHubData.wifiPass};;`;
+            document.getElementById('sub-wifi-name').innerText = `SSID: ${globalHubData.wifiSSID}`;
+        }
+
+        // Bluetooth Setup configuration display parameters
+        if (globalHubData.btName) {
+            document.getElementById('btn-bt').style.display = 'flex';
+            document.getElementById('sub-bt-name').innerText = `Identify: ${globalHubData.btName}`;
+        }
+
+        // Instagram Verification profiles
+        if (globalHubData.ig) {
+            const igBtn = document.getElementById('btn-instagram');
+            igBtn.style.display = 'flex';
+            igBtn.href = `https://instagram.com/${globalHubData.ig}`;
+            document.getElementById('sub-instagram').innerText = `@${globalHubData.ig}`;
+        }
+
+        // LinkedIn network parameters
+        if (globalHubData.li) {
+            const liBtn = document.getElementById('btn-linkedin');
+            liBtn.style.display = 'flex';
+            liBtn.href = `https://linkedin.com/in/${globalHubData.li}`;
+            document.getElementById('sub-linkedin').innerText = `id: ${globalHubData.li}`;
+        }
+    }
+
+    function copyBluetoothName() {
+        navigator.clipboard.writeText(globalHubData.btName);
+        alert(`Bluetooth Pairing Asset ID [ ${globalHubData.btName} ] copied to clipboard array matrix.`);
     }
 
     function toggleInspectorPanel() {
@@ -686,12 +813,17 @@
             const sim2 = document.getElementById('hub-sim2').value.trim();
             const email = document.getElementById('hub-email').value.trim();
             const msg = document.getElementById('hub-wa-msg').value.trim();
+            const wifiSSID = document.getElementById('hub-wifi-ssid').value.trim();
+            const wifiPass = document.getElementById('hub-wifi-pass').value.trim();
+            const btName = document.getElementById('hub-bt-name').value.trim();
+            const ig = document.getElementById('hub-instagram').value.trim();
+            const li = document.getElementById('hub-linkedin').value.trim();
 
             if (!name) return alert("Profile Name attribute required.");
             if (!sim1 && !sim2) return alert("At least one target SIM interface allocation is mandatory.");
 
             const baseSystemURL = window.location.origin + window.location.pathname;
-            routingPayload = `${baseSystemURL}?n=${encodeURIComponent(name)}&s1=${encodeURIComponent(sim1)}&s2=${encodeURIComponent(sim2)}&e=${encodeURIComponent(email)}&m=${encodeURIComponent(msg)}`;
+            routingPayload = `${baseSystemURL}?n=${encodeURIComponent(name)}&s1=${encodeURIComponent(sim1)}&s2=${encodeURIComponent(sim2)}&e=${encodeURIComponent(email)}&m=${encodeURIComponent(msg)}&ws=${encodeURIComponent(wifiSSID)}&wp=${encodeURIComponent(wifiPass)}&bt=${encodeURIComponent(btName)}&ig=${encodeURIComponent(ig)}&li=${encodeURIComponent(li)}`;
             
             saveToMemoryBank(name, routingPayload);
         }
