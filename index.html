@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Multi-SIM QR Hub</title>
+    <!-- Secure QR Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #22c55e;
+            --success-hover: #16a34a;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-glow: rgba(99, 102, 241, 0.15);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: rgba(15, 23, 42, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: clamp(1rem, 4vw, 2.5rem);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(1rem, 3vw, 2rem);
+        }
+
+        @media (min-width: 850px) {
+            .container.dashboard-mode {
+                grid-template-columns: 1.25fr 0.75fr;
+            }
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: clamp(1.25rem, 3vw, 2rem);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h2 {
+            font-size: clamp(1.4rem, 2.5vw, 1.75rem);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            background: linear-gradient(to right, #ffffff, #c7d2fe);
+            h2 {
+    /* ... your other styles ... */
+    background: linear-gradient(to right, #ffffff, #c7d2fe);
+    -webkit-background-clip: text; /* For Safari/Chrome */
+    background-clip: text;         /* The standard property (Adds compatibility) */
+    -webkit-text-fill-color: transparent;
+}
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            font-size: 11px;
+            margin-bottom: 8px;
+            color: #a5b4fc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-size: 15px;
+            background: var(--input-bg);
+            color: var(--text-main);
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        .phone-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+        @media (min-width: 600px) {
+            .phone-row { grid-template-columns: 1fr 1fr; gap: 16px; }
+        }
+
+        button {
+            width: 100%;
+            padding: 14px 20px;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.2px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn-success { background: var(--success); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2); }
+        .btn-success:hover { background: var(--success-hover); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--glass-border); box-shadow: none; }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        #qr-container {
+            display: none;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: clamp(1rem, 3vw, 1.5rem);
+            border-radius: 16px;
+            border: 1px dashed var(--glass-border);
+            margin-top: 24px;
+        }
+
+        canvas {
+            background: white;
+            padding: 14px;
+            border-radius: 12px;
+            max-width: 100%;
+            height: auto !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        /* Hub Interface Styles */
+        .hub-container {
+            max-width: 500px;
+            width: 100%;
+            display: none;
+            text-align: center;
+        }
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
+            border-radius: 50%;
+            margin: 0 auto 16px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+        }
+        .hub-btn {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 16px 20px;
+            font-size: 16px;
+            margin-bottom: 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border);
+            text-decoration: none;
+            color: var(--text-main);
+            border-radius: 16px;
+            font-weight: 600;
+        }
+        .hub-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--primary);
+            transform: translateX(4px);
+        }
+        .hub-btn span { margin-right: 14px; font-size: 20px; }
+        .hub-btn .subtitle {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 400;
+            text-align: left;
+        }
+        .hub-btn div { display: flex; flex-direction: column; align-items: flex-start; }
+
+        .history-list { list-style: none; padding: 0; margin: 0; max-height: 380px; overflow-y: auto; }
+        .history-item {
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            font-size: 13.5px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-item:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.08); }
+        .clear-btn { background: transparent; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 12px; padding: 10px; margin-top: auto; box-shadow: none; }
+        .clear-btn:hover { background: rgba(239, 68, 68, 0.1); }
+        .helper-text { font-size: 12px; color: var(--text-muted); margin-top: -14px; margin-bottom: 16px; display: block; }
+    </style>
+</head>
+<body>
+
+<!-- WORKSPACE: Dashboard Mode Layout -->
+<div id="dashboard-view" class="container dashboard-mode" style="display: none;">
+    <div class="card">
+        <h2>Multi-SIM Smart Hub Workspace</h2>
+        <p>Compile modern multi-action profiles into a unified dynamic routing QR asset.</p>
+
+        <label for="hub-name">Full Name or Business Name</label>
+        <input type="text" id="hub-name" placeholder="John Doe Logistics">
+
+        <div class="phone-row">
+            <div>
+                <label for="hub-sim1">SIM 1 Line (Primary / Work)</label>
+                <input type="tel" id="hub-sim1" placeholder="+1234567890">
+            </div>
+            <div>
+                <label for="hub-sim2">SIM 2 Line (Secondary / Personal)</label>
+                <input type="tel" id="hub-sim2" placeholder="+10987654321">
+            </div>
+        </div>
+
+        <label for="hub-email">Email Address</label>
+        <input type="email" id="hub-email" placeholder="john@company.com">
+
+        <label for="hub-wa-msg">Default WhatsApp Pre-filled Text</label>
+        <textarea id="hub-wa-msg" rows="2" placeholder="Hello! I am viewing your Smart Hub profile card. Let's connect."></textarea>
+
+        <button onclick="compileSmartHubQR()">Compile Smart Hub Asset</button>
+
+        <div id="qr-container">
+            <canvas id="qr"></canvas>
+            <div class="action-grid">
+                <button class="btn-success" onclick="downloadQR()">Export PNG</button>
+                <button class="btn-secondary" onclick="copyQRToClipboard()">Copy Clip</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Storage Memory Log -->
+    <div class="card" style="min-height: 300px;">
+        <div>
+            <h2>Compiled Profile Cache</h2>
+            <p>Active routing matrices saved on your machine's local web cache sandbox.</p>
+            <ul id="history-box" class="history-list"></ul>
+        </div>
+        <button class="clear-btn" onclick="clearHistoryLog()">Flush Workspace Cache</button>
+    </div>
+</div>
+
+<!-- CONSUMER: Dynamic Profile Hub Mode Layout -->
+<div id="hub-view" class="hub-container">
+    <div class="card">
+        <div id="hub-avatar" class="avatar-circle">U</div>
+        <h2 id="display-name" style="margin-bottom: 4px;">User Profile</h2>
+        <p id="display-subtitle" style="margin-bottom: 24px;">Secure Action Routing Hub</p>
+
+        <!-- Dynamic Touch Targets -->
+        <a id="btn-call-sim1" href="#" class="hub-btn">
+            <span>📞</span>
+            <div>
+                <strong>Call SIM 1 Line</strong>
+                <span class="subtitle" id="sub-sim1">Primary Cellular Interface</span>
+            </div>
+        </a>
+
+        <a id="btn-call-sim2" href="#" class="hub-btn">
+            <span>📱</span>
+            <div>
+                <strong>Call SIM 2 Line</strong>
+                <span class="subtitle" id="sub-sim2">Secondary Cellular Interface</span>
+            </div>
+        </a>
+
+        <a id="btn-wa-sim1" href="#" class="hub-btn" style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.2);">
+            <span>💬</span>
+            <div>
+                <strong style="color: #4ade80;">Secure WhatsApp Chat</strong>
+                <span class="subtitle">Open conversation instantly via SIM 1</span>
+            </div>
+        </a>
+
+        <button onclick="downloadUnifiedVCard()" class="hub-btn" style="background: rgba(99, 102, 241, 0.1); border-color: rgba(99,102,241,0.3); width:100%; cursor:pointer;">
+            <span>📇</span>
+            <div>
+                <strong style="color: #a5b4fc;">Save Full Contact Card</strong>
+                <span class="subtitle">Export all SIM nodes directly to device contacts</span>
+            </div>
+        </button>
+    </div>
+</div>
+
+<script>
+    // Storage Node Architecture Definition
+    let globalHubData = {};
+
+    // System Orchestration Lifecycle Hook
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Router Flag: Check if incoming link contains user parameters
+        if (urlParams.has('n') && (urlParams.has('s1') || urlParams.has('s2'))) {
+            initConsumerHubView(urlParams);
+        } else {
+            initDashboardWorkspaceView();
+        }
+    };
+
+    function initDashboardWorkspaceView() {
+        document.getElementById('dashboard-view').style.display = 'grid';
+        renderSavedHistory();
+    }
+
+    function initConsumerHubView(params) {
+        document.getElementById('hub-view').style.display = 'block';
+        
+        globalHubData = {
+            name: params.get('n'),
+            sim1: params.get('s1') || '',
+            sim2: params.get('s2') || '',
+            email: params.get('e') || '',
+            msg: params.get('m') || "Hello! Let's connect."
+        };
+
+        // UI Text Node Binding
+        document.getElementById('display-name').innerText = globalHubData.name;
+        document.getElementById('hub-avatar').innerText = globalHubData.name.charAt(0).toUpperCase();
+
+        // Target Handler: SIM 1
+        if (globalHubData.sim1) {
+            document.getElementById('btn-call-sim1').href = `tel:${globalHubData.sim1}`;
+            document.getElementById('sub-sim1').innerText = globalHubData.sim1;
+            document.getElementById('btn-wa-sim1').href = `https://wa.me/${globalHubData.sim1.replace(/\+/g, '')}?text=${encodeURIComponent(globalHubData.msg)}`;
+        } else {
+            document.getElementById('btn-call-sim1').style.display = 'none';
+            document.getElementById('btn-wa-sim1').style.display = 'none';
+        }
+
+        // Target Handler: SIM 2
+        if (globalHubData.sim2) {
+            document.getElementById('btn-call-sim2').href = `tel:${globalHubData.sim2}`;
+            document.getElementById('sub-sim2').innerText = globalHubData.sim2;
+        } else {
+            document.getElementById('btn-call-sim2').style.display = 'none';
+        }
+    }
+
+    function compileSmartHubQR() {
+        const name = document.getElementById('hub-name').value.trim();
+        const sim1 = document.getElementById('hub-sim1').value.trim();
+        const sim2 = document.getElementById('hub-sim2').value.trim();
+        const email = document.getElementById('hub-email').value.trim();
+        const msg = document.getElementById('hub-wa-msg').value.trim();
+
+        if (!name) return alert("A Profile Name or Business Title is mandatory.");
+        if (!sim1 && !sim2) return alert("At least one active cellular interface (SIM 1 or SIM 2) must be provisioned.");
+
+        // Clean base URL link extraction (removes existing dashboard tags)
+        const baseSystemURL = window.location.origin + window.location.pathname;
+        
+        // Compact URL Query Encryption Vector construction
+        const routingPayload = `${baseSystemURL}?n=${encodeURIComponent(name)}&s1=${encodeURIComponent(sim1)}&s2=${encodeURIComponent(sim2)}&e=${encodeURIComponent(email)}&m=${encodeURIComponent(msg)}`;
+
+        // Draw Matrix Layout Geometry
+        new QRious({
+            element: document.getElementById('qr'),
+            value: routingPayload,
+            size: 800,
+            level: 'M'
+        });
+
+        document.getElementById('qr-container').style.style = 'block';
+        document.getElementById('qr-container').style.display = 'block';
+        document.getElementById('qr-container').scrollIntoView({ behavior: 'smooth' });
+
+        saveToMemoryBank(name, routingPayload);
+    }
+
+    function downloadUnifiedVCard() {
+        // Formulates a standards-compliant multi-number business vCard layout
+        const vcardPayload = [
+            'BEGIN:VCARD',
+            'VERSION:3.0',
+            `FN:${globalHubData.name}`,
+            globalHubData.sim1 ? `TEL;TYPE=CELL,VOICE,MSG:${globalHubData.sim1}` : '',
+            globalHubData.sim2 ? `TEL;TYPE=CELL,WORK,SIM2:${globalHubData.sim2}` : '',
+            globalHubData.email ? `EMAIL;TYPE=PREF,INTERNET:${globalHubData.email}` : '',
+            'END:VCARD'
+        ].filter(Boolean).join('\n');
+
+        const blob = new Blob([vcardPayload], { type: 'text/vcard;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.download = `${globalHubData.name.replace(/\s+/g, '_')}_contact.vcf`;
+        link.href = URL.createObjectURL(blob);
+        link.click();
+    }
+
+    function downloadQR() {
+        const link = document.createElement('a');
+        link.download = 'smarthub-matrix-export.png';
+        link.href = document.getElementById('qr').toDataURL('image/png', 1.0);
+        link.click();
+    }
+
+    async function copyQRToClipboard() {
+        try {
+            const canvas = document.getElementById('qr');
+            canvas.toBlob(async (blob) => {
+                const item = new ClipboardItem({ "image/png": blob });
+                await navigator.clipboard.write([item]);
+                alert("Smart Hub Matrix structural data written to local clipboard cache!");
+            });
+        } catch (err) {
+            alert("Clipboard action error. Please use standard PNG image export.");
+        }
+    }
+
+    // Storage Infrastructure Operations
+    function saveToMemoryBank(name, payload) {
+        let history = JSON.parse(localStorage.getItem('sh_history')) || [];
+        history = history.filter(item => item.payload !== payload);
+        history.unshift({ name, payload, date: new Date().toLocaleDateString() });
+        if (history.length > 8) history.pop();
+        localStorage.setItem('sh_history', JSON.stringify(history));
+        renderSavedHistory();
+    }
+
+    function renderSavedHistory() {
+        const container = document.getElementById('history-box');
+        const history = JSON.parse(localStorage.getItem('sh_history')) || [];
+        container.innerHTML = history.length === 0 ? '<li style="color:var(--text-muted); font-size:13px; text-align:center; padding-top:40px;">No compiled assets found.</li>' : '';
+
+        history.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'history-item';
+            li.onclick = () => {
+                // Parse historical payload nodes back into active rendering grid canvas
+                new QRious({
+                    element: document.getElementById('qr'),
+                    value: item.payload,
+                    size: 800,
+                    level: 'M'
+                });
+                document.getElementById('qr-container').style.display = 'block';
+            };
+            li.innerHTML = `
+                <div>
+                    <span class="history-tag" style="background:rgba(99,102,241,0.2); color:#818cf8; padding:2px 6px; font-size:10px; border-radius:4px; font-weight:700; text-transform:uppercase;">HUB</span> 
+                    <strong style="margin-left: 8px; color: var(--text-main);">${item.name}</strong>
+                </div>
+                <span style="font-size:11px; color:var(--text-muted);">${item.date}</span>
+            `;
+            container.appendChild(li);
+        });
+    }
+
+    function clearHistoryLog() {
+        if(confirm("Flush physical database history parameters?")) {
+            localStorage.removeItem('sh_history');
+            renderSavedHistory();
+        }
+    }
+</script>
+
+</body>
+</html>
